@@ -1,0 +1,207 @@
+{
+  "timestamp": "2026-03-10T07:17:30.629Z",
+  "reason": "compaction",
+  "status": {
+    "version": "2.0",
+    "lastUpdated": "2026-03-10T07:02:21.650Z",
+    "activeFeatures": [
+      "mindfulness",
+      "data",
+      "store",
+      "screens"
+    ],
+    "primaryFeature": "mindfulness",
+    "features": {
+      "mindfulness": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-10T05:38:21.718Z",
+          "lastUpdated": "2026-03-10T07:01:32.705Z"
+        },
+        "lastFile": "D:/ai_project/1.tose/mindfulness/src/utils/audioEngine.ts"
+      },
+      "data": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-10T05:39:24.441Z",
+          "lastUpdated": "2026-03-10T05:39:24.441Z"
+        },
+        "lastFile": "D:/ai_project/1.tose/mindfulness/src/data/sessions.ts"
+      },
+      "store": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-10T05:39:42.168Z",
+          "lastUpdated": "2026-03-10T05:39:42.168Z"
+        },
+        "lastFile": "D:/ai_project/1.tose/mindfulness/src/store/useStore.ts"
+      },
+      "screens": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-10T05:41:22.223Z",
+          "lastUpdated": "2026-03-10T07:02:21.650Z"
+        },
+        "lastFile": "D:/ai_project/1.tose/mindfulness/src/screens/SessionScreen.tsx"
+      }
+    },
+    "pipeline": {
+      "currentPhase": 1,
+      "level": "Dynamic",
+      "phaseHistory": []
+    },
+    "session": {
+      "startedAt": "2026-03-10T05:17:16.537Z",
+      "onboardingCompleted": false,
+      "lastActivity": "2026-03-10T07:02:21.650Z"
+    },
+    "history": [
+      {
+        "timestamp": "2026-03-10T05:38:21.718Z",
+        "feature": "mindfulness",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-10T05:38:32.946Z",
+        "feature": "mindfulness",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-10T05:39:24.441Z",
+        "feature": "data",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-10T05:39:42.168Z",
+        "feature": "store",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-10T05:39:51.963Z",
+        "feature": "mindfulness",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-10T05:40:04.360Z",
+        "feature": "mindfulness",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-10T05:40:24.085Z",
+        "feature": "mindfulness",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-10T05:40:52.193Z",
+        "feature": "mindfulness",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-10T05:41:22.223Z",
+        "feature": "screens",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-10T05:41:54.922Z",
+        "feature": "screens",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-10T05:42:40.411Z",
+        "feature": "screens",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-10T05:43:44.238Z",
+        "feature": "screens",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-10T05:45:11.847Z",
+        "feature": "screens",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-10T05:46:09.628Z",
+        "feature": "mindfulness",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-10T05:46:22.892Z",
+        "feature": "mindfulness",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-10T06:48:53.337Z",
+        "feature": "mindfulness",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-10T06:49:47.194Z",
+        "feature": "screens",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-10T06:50:12.122Z",
+        "feature": "mindfulness",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-10T06:50:18.942Z",
+        "feature": "mindfulness",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-10T07:01:32.705Z",
+        "feature": "mindfulness",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-10T07:02:21.650Z",
+        "feature": "screens",
+        "phase": "do",
+        "action": "updated"
+      }
+    ]
+  }
+}

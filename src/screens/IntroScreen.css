@@ -1,0 +1,161 @@
+.intro-shell {
+  position: relative;
+  overflow: hidden;
+}
+
+.intro-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, #2E3A8C 0%, #5C6BC0 55%, #9575CD 100%);
+  z-index: 0;
+}
+
+.intro-bg::after {
+  content: '';
+  position: absolute;
+  bottom: -60px;
+  left: -60px;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.intro-bg::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.intro-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0 28px 48px;
+  justify-content: space-between;
+}
+
+/* 로고 */
+.intro-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 96px;
+  gap: 8px;
+}
+
+.intro-logo-icon {
+  font-size: 64px;
+  line-height: 1;
+  margin-bottom: 8px;
+  filter: drop-shadow(0 4px 16px rgba(0,0,0,0.2));
+}
+
+.intro-title {
+  font-size: 32px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -1px;
+}
+
+.intro-subtitle {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.75);
+  font-weight: 400;
+  letter-spacing: -0.3px;
+}
+
+/* 기능 소개 */
+.intro-features {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 24px 20px;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.intro-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.intro-feature-icon {
+  font-size: 26px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.intro-feature-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.3px;
+  margin-bottom: 2px;
+}
+
+.intro-feature-desc {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.65);
+  letter-spacing: -0.2px;
+}
+
+/* CTA */
+.intro-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.intro-login-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 17px;
+  background: #3182F6;
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: -0.3px;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  box-shadow: 0 4px 20px rgba(49, 130, 246, 0.4);
+}
+
+.intro-login-btn:active:not(:disabled) {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+
+.intro-login-btn:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.intro-notice {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: -0.2px;
+}

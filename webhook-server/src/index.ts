@@ -130,12 +130,50 @@ async function updateUserProfile(tossUserId: number, isPremium: boolean, premium
 // ── mTLS 에이전트 ──────────────────────────────────────────────────────────
 
 function createTossAgent(): https.Agent | undefined {
+  // Railway 등 파일시스템이 없는 환경: base64 env var 우선
+  const certContent = process.env.TOSS_CERT_CONTENT;
+  const keyContent  = process.env.TOSS_KEY_CONTENT;
+  if (certContent && keyContent) {
+    return new https.Agent({
+      cert: Buffer.from(certContent, 'base64'),
+      key:  Buffer.from(keyContent, 'base64'),
+      rejectUnauthorized: true,
+    });
+  }
+  // 로컬 개발: 파일 경로
   if (!fs.existsSync(CERT_PATH) || !fs.existsSync(KEY_PATH)) return undefined;
   return new https.Agent({
     cert: fs.readFileSync(CERT_PATH),
     key:  fs.readFileSync(KEY_PATH),
     rejectUnauthorized: true,
   });
+}
+
+/**
+ * mTLS로 Toss API 호출하는 내부 헬퍼
+ * path: /generate-token | /refresh-token | /login-me | /access/remove-by-*
+ */
+async function tossApiProxy(
+  apiPath: string,
+  method: string,
+  headers: Record<string, string>,
+  body?: string,
+): Promise<{ status: number; body: string }> {
+  const agent = createTossAgent();
+  if (!agent) throw new Error('mTLS 인증서 없음');
+
+  const res = await (fetch as typeof fetch)(
+    `${TOSS_API_BASE}/api-partner/v1/apps-in-toss/user/oauth2${apiPath}`,
+    {
+      method,
+      headers: { 'Content-Type': 'application/json', ...headers },
+      body,
+      // @ts-ignore
+      agent,
+    }
+  );
+  const text = await res.text();
+  return { status: res.status, body: text };
 }
 
 // ── 알림 스케줄러 ──────────────────────────────────────────────────────────
@@ -329,6 +367,51 @@ async function handleFailed(payload: TossIapWebhookPayload): Promise<void> {
 // raw body 보존 (서명 검증용)
 app.use('/webhook', express.raw({ type: 'application/json' }));
 app.use(express.json());
+
+// CORS — ait 웹뷰에서 Railway 서버 직접 호출 허용
+app.use('/auth/toss', (req: Request, res: Response, next: NextFunction) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') { res.sendStatus(204); return; }
+  next();
+});
+
+// ── Toss OAuth 프록시 (mTLS) ───────────────────────────────────────────────
+
+/** POST /auth/toss/generate-token — authorizationCode → accessToken */
+app.post('/auth/toss/generate-token', async (req: Request, res: Response) => {
+  try {
+    const result = await tossApiProxy('/generate-token', 'POST', {}, JSON.stringify(req.body));
+    res.status(result.status).send(result.body);
+  } catch (err) {
+    console.error('[AUTH] generate-token 오류:', err);
+    res.status(500).json({ error: String(err) });
+  }
+});
+
+/** POST /auth/toss/refresh-token — refreshToken → 새 accessToken */
+app.post('/auth/toss/refresh-token', async (req: Request, res: Response) => {
+  try {
+    const result = await tossApiProxy('/refresh-token', 'POST', {}, JSON.stringify(req.body));
+    res.status(result.status).send(result.body);
+  } catch (err) {
+    console.error('[AUTH] refresh-token 오류:', err);
+    res.status(500).json({ error: String(err) });
+  }
+});
+
+/** GET /auth/toss/login-me — accessToken으로 유저 정보 조회 */
+app.get('/auth/toss/login-me', async (req: Request, res: Response) => {
+  const auth = req.headers['authorization'] as string ?? '';
+  try {
+    const result = await tossApiProxy('/login-me', 'GET', { Authorization: auth });
+    res.status(result.status).send(result.body);
+  } catch (err) {
+    console.error('[AUTH] login-me 오류:', err);
+    res.status(500).json({ error: String(err) });
+  }
+});
 
 // 헬스체크
 app.get('/health', (_req: Request, res: Response) => {

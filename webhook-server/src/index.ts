@@ -131,14 +131,20 @@ async function updateUserProfile(tossUserId: number, isPremium: boolean, premium
 
 function createTossAgent(): https.Agent | undefined {
   // Railway 등 파일시스템이 없는 환경: base64 env var 우선
-  const certContent = process.env.TOSS_CERT_CONTENT;
-  const keyContent  = process.env.TOSS_KEY_CONTENT;
+  const certContent = process.env.TOSS_CERT_CONTENT?.replace(/\s/g, '');
+  const keyContent  = process.env.TOSS_KEY_CONTENT?.replace(/\s/g, '');
   if (certContent && keyContent) {
-    return new https.Agent({
-      cert: Buffer.from(certContent, 'base64'),
-      key:  Buffer.from(keyContent, 'base64'),
-      rejectUnauthorized: true,
-    });
+    try {
+      const agent = new https.Agent({
+        cert: Buffer.from(certContent, 'base64'),
+        key:  Buffer.from(keyContent, 'base64'),
+        rejectUnauthorized: true,
+      });
+      console.log('[mTLS] env var 인증서 로드 성공');
+      return agent;
+    } catch (e) {
+      console.error('[mTLS] env var 인증서 로드 실패:', e);
+    }
   }
   // 로컬 개발: 파일 경로
   if (!fs.existsSync(CERT_PATH) || !fs.existsSync(KEY_PATH)) return undefined;
@@ -415,7 +421,8 @@ app.get('/auth/toss/login-me', async (req: Request, res: Response) => {
 
 // 헬스체크
 app.get('/health', (_req: Request, res: Response) => {
-  res.json({ status: 'ok', env: BKEND_ENV, notifCount: notifSchedules.size });
+  const hasCert = !!(process.env.TOSS_CERT_CONTENT?.replace(/\s/g, '') && process.env.TOSS_KEY_CONTENT?.replace(/\s/g, ''));
+  res.json({ status: 'ok', env: BKEND_ENV, notifCount: notifSchedules.size, mtls: hasCert ? 'loaded' : 'missing' });
 });
 
 // ── 알림 스케줄 API ────────────────────────────────────────────────────────

@@ -157,7 +157,7 @@ function createTossAgent(): https.Agent | undefined {
 
 /**
  * mTLS로 Toss API 호출하는 내부 헬퍼
- * path: /generate-token | /refresh-token | /login-me | /access/remove-by-*
+ * native fetch는 https.Agent를 지원하지 않으므로 https.request 직접 사용
  */
 async function tossApiProxy(
   apiPath: string,
@@ -168,18 +168,34 @@ async function tossApiProxy(
   const agent = createTossAgent();
   if (!agent) throw new Error('mTLS 인증서 없음');
 
-  const res = await (fetch as typeof fetch)(
-    `${TOSS_API_BASE}/api-partner/v1/apps-in-toss/user/oauth2${apiPath}`,
-    {
-      method,
-      headers: { 'Content-Type': 'application/json', ...headers },
-      body,
-      // @ts-ignore
-      agent,
-    }
-  );
-  const text = await res.text();
-  return { status: res.status, body: text };
+  const url = new URL(`${TOSS_API_BASE}/api-partner/v1/apps-in-toss/user/oauth2${apiPath}`);
+
+  return new Promise((resolve, reject) => {
+    const reqHeaders: Record<string, string> = {
+      'Content-Type': 'application/json',
+      ...headers,
+    };
+    if (body) reqHeaders['Content-Length'] = Buffer.byteLength(body).toString();
+
+    const req = https.request(
+      {
+        hostname: url.hostname,
+        port: url.port || 443,
+        path: url.pathname + url.search,
+        method,
+        headers: reqHeaders,
+        agent,
+      },
+      (res) => {
+        let data = '';
+        res.on('data', (chunk: Buffer) => { data += chunk.toString(); });
+        res.on('end', () => resolve({ status: res.statusCode ?? 500, body: data }));
+      }
+    );
+    req.on('error', reject);
+    if (body) req.write(body);
+    req.end();
+  });
 }
 
 // ── 알림 스케줄러 ──────────────────────────────────────────────────────────

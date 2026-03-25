@@ -6,6 +6,7 @@ dist/
 build/
 
 # Environment variables
+.env
 .env.local
 .env.*.local
 
@@ -19,3 +20,6 @@ Thumbs.db
 
 # Logs
 *.log
+
+# mTLS 인증서 (유출 방지)
+cert_key/

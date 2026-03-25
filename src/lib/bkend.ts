@@ -72,6 +72,17 @@ export interface UserProfileRow {
   isDarkMode: boolean;
 }
 
+export interface SubscriptionRow {
+  id?: string;
+  tossUserId: number;
+  plan: 'monthly' | 'annual';
+  status: 'active' | 'expired' | 'cancelled';
+  startedAt: string;  // ISO 8601
+  expiresAt: string;  // ISO 8601
+  amount: number;     // 4900 or 39900
+  orderId?: string;
+}
+
 // ─── API ──────────────────────────────────────────────────────────────────────
 
 export const bkend = {
@@ -96,6 +107,26 @@ export const bkend = {
 
     create: (row: Omit<DiaryEntryRow, 'id'>) =>
       bkendFetch<DiaryEntryRow>('/data/diary_entries', {
+        method: 'POST',
+        body: JSON.stringify(row),
+      }),
+  },
+
+  subscriptions: {
+    getActive: async (tossUserId: number): Promise<SubscriptionRow | null> => {
+      const qs = new URLSearchParams({
+        'filter[tossUserId]': String(tossUserId),
+        'filter[status]': 'active',
+        sort: 'expiresAt:desc',
+        limit: '5',
+      });
+      const res = await bkendFetch<ListResponse<SubscriptionRow>>(`/data/subscriptions?${qs}`);
+      const now = Date.now();
+      return res.data.find(s => new Date(s.expiresAt).getTime() > now) ?? null;
+    },
+
+    create: (row: Omit<SubscriptionRow, 'id'>) =>
+      bkendFetch<SubscriptionRow>('/data/subscriptions', {
         method: 'POST',
         body: JSON.stringify(row),
       }),

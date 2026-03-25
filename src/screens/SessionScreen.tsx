@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BreathingCircle } from '../components/BreathingCircle';
 import { useStore } from '../store/useStore';
 import { SESSIONS } from '../data/sessions';
+import { GoogleAdMob } from '@apps-in-toss/web-bridge';
 import {
   startSessionSound,
   stopSessionSound,
@@ -10,6 +11,7 @@ import {
   playCompletionBell,
   disposeAudio,
   CATEGORY_SOUND_PROFILES,
+  SESSION_SOUND_PROFILE_OVERRIDES,
   SessionCategory,
 } from '../utils/audioEngine';
 import './SessionScreen.css';
@@ -23,14 +25,18 @@ export function SessionScreen() {
   const [showBreath, setShowBreath] = useState(false);
   const [activeBreathTab, setActiveBreathTab] = useState<'4-7-8' | 'box' | 'simple'>('simple');
   const [volume, setVolume] = useState(0.4);
+  const [showRewardAd, setShowRewardAd] = useState(false);
+  const [rewardClaimed, setRewardClaimed] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const adCleanupRef = useRef<(() => void) | null>(null);
 
   const session = currentSession || SESSIONS[0];
   const totalSeconds = session.duration * 60;
   const progress = Math.min(elapsed / totalSeconds, 1);
   const isLocked = session.isPremium && !isPremium;
 
-  const soundProfile = CATEGORY_SOUND_PROFILES[session.category as SessionCategory]
+  const soundProfile = SESSION_SOUND_PROFILE_OVERRIDES[session.id]
+    ?? CATEGORY_SOUND_PROFILES[session.category as SessionCategory]
     ?? CATEGORY_SOUND_PROFILES.stress;
 
   // 세션 변경 시 초기화
@@ -45,7 +51,10 @@ export function SessionScreen() {
     };
   }, [session.id]);
 
-  useEffect(() => () => { disposeAudio(); }, []);
+  useEffect(() => () => {
+    disposeAudio();
+    adCleanupRef.current?.();
+  }, []);
 
   // 재생 상태 → 오디오 제어
   useEffect(() => {
@@ -68,12 +77,53 @@ export function SessionScreen() {
       stopSessionSound(true);
       playCompletionBell();
       completeMeditation(session);
+      if (import.meta.env.PROD) {
+        let loadSupported = false;
+        try { loadSupported = GoogleAdMob.loadAppsInTossAdMob.isSupported(); } catch { /* unsupported */ }
+
+        if (loadSupported) {
+          adCleanupRef.current?.();
+          adCleanupRef.current = GoogleAdMob.loadAppsInTossAdMob({
+            options: { adGroupId: 'ait.v2.live.61a0fdd3a6464189' },
+            onEvent: (event) => { if (event.type === 'loaded') setShowRewardAd(true); },
+            onError: () => setShowRewardAd(true),
+          });
+        } else {
+          setTimeout(() => setShowRewardAd(true), 1000);
+        }
+      } else {
+        setTimeout(() => setShowRewardAd(true), 1000);
+      }
 
     } else {
       if (intervalRef.current) clearInterval(intervalRef.current);
     }
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [playerState]); // eslint-disable-line
+
+  const handleWatchAd = useCallback(() => {
+    if (!import.meta.env.PROD) {
+      // dev 환경: 광고 시청 시뮬레이션
+      setTimeout(() => {
+        useStore.setState(s => ({ maumPoints: s.maumPoints + 3 }));
+        setRewardClaimed(true);
+      }, 1500);
+      return;
+    }
+    try { if (!GoogleAdMob.showAppsInTossAdMob.isSupported()) return; } catch { return; }
+    GoogleAdMob.showAppsInTossAdMob({
+      options: { adGroupId: 'ait.v2.live.61a0fdd3a6464189' },
+      onEvent: (event) => {
+        if (event.type === 'userEarnedReward') {
+          useStore.setState(s => ({ maumPoints: s.maumPoints + 3 }));
+          setRewardClaimed(true);
+        } else if (event.type === 'dismissed' && !rewardClaimed) {
+          setShowRewardAd(false);
+        }
+      },
+      onError: () => setShowRewardAd(false),
+    });
+  }, [rewardClaimed]);
 
   const handlePlayToggle = () =>
     setPlayerState(p => p === 'playing' ? 'paused' : 'playing');
@@ -132,8 +182,8 @@ export function SessionScreen() {
           </div>
           <div className="completed-divider" />
           <div className="completed-stat">
-            <span className="cs-value">+{session.duration >= 10 ? 100 : 50}P</span>
-            <span className="cs-label">포인트 적립</span>
+            <span className="cs-value">+3코인</span>
+            <span className="cs-label">마음코인 적립</span>
           </div>
         </div>
         <button className="completed-btn" onClick={() => { setPlayerState('idle'); setElapsed(0); setActiveTab('home'); }}>
@@ -142,6 +192,46 @@ export function SessionScreen() {
         <button className="completed-btn-ghost" onClick={() => { setPlayerState('idle'); setElapsed(0); setActiveTab('record'); }}>
           기록 확인하기
         </button>
+
+        {/* 리워드 광고 모달 */}
+        <AnimatePresence>
+          {showRewardAd && (
+            <motion.div
+              className="reward-ad-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <motion.div
+                className="reward-ad-modal"
+                initial={{ y: 60, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 60, opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 28 }}
+              >
+                {rewardClaimed ? (
+                  <>
+                    <div className="reward-ad-success-icon">🎉</div>
+                    <p className="reward-ad-title">보너스 마음코인 적립!</p>
+                    <p className="reward-ad-desc">+3코인이 마음코인에 추가됐어요</p>
+                    <button className="reward-ad-btn" onClick={() => setShowRewardAd(false)}>
+                      확인
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <p className="reward-ad-eyebrow">광고 시청 리워드</p>
+                    <p className="reward-ad-title">짧은 광고를 보고<br />보너스 마음코인을 받아요</p>
+                    <p className="reward-ad-desc">+3코인 추가 적립</p>
+                    <button className="reward-ad-btn" onClick={handleWatchAd}>
+                      광고 보기
+                    </button>
+                  </>
+                )}
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
     );
   }
@@ -173,8 +263,8 @@ export function SessionScreen() {
           <span className="session-meta-item">⏱ {session.duration}분</span>
           <span className="session-meta-item">👤 {session.instructor}</span>
           {session.isPremium
-            ? <span className="badge badge-premium">PRO</span>
-            : <span className="badge badge-free">FREE</span>}
+            ? <span className="badge badge-premium">Premium</span>
+            : <span className="badge badge-free">Free</span>}
         </div>
       </div>
 
@@ -233,9 +323,7 @@ export function SessionScreen() {
 
           {/* 컨트롤 */}
           <div className="player-controls">
-            <button className="ctrl-btn ctrl-reset" onClick={handleReset} disabled={playerState === 'idle'}>
-              ↺
-            </button>
+            <button className="ctrl-btn ctrl-stop" onClick={handleReset} disabled={playerState === 'idle'} />
             <motion.button
               className={`ctrl-btn ctrl-play ${playerState === 'playing' ? 'playing' : ''}`}
               onClick={handlePlayToggle}

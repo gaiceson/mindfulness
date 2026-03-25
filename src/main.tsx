@@ -15,6 +15,10 @@ if (saved) {
   } catch {}
 }
 
+// 진단: main.tsx 실행 확인
+console.log('[마음챙김] main.tsx 실행됨');
+document.getElementById('app-loading')?.remove();
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />

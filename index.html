@@ -14,6 +14,30 @@
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   </head>
   <body>
+    <!-- 진단용: React 마운트 전 표시, main.tsx에서 제거 -->
+    <div id="app-loading" style="position:fixed;inset:0;background:#2E3A8C;color:white;display:flex;align-items:center;justify-content:center;flex-direction:column;font-family:sans-serif;z-index:9999;">
+      <div style="font-size:48px;margin-bottom:16px">🧘</div>
+      <p style="font-size:15px;opacity:0.9">로딩 중...</p>
+    </div>
+    <!-- JS 에러 시 화면에 표시 -->
+    <script>
+      function showError(msg, detail) {
+        var overlay = document.getElementById('error-overlay');
+        if (!overlay) {
+          overlay = document.createElement('div');
+          overlay.id = 'error-overlay';
+          overlay.style.cssText = 'position:fixed;inset:0;background:#1A0A0A;color:white;display:flex;align-items:flex-start;justify-content:center;padding:40px 20px;font-family:monospace;font-size:12px;z-index:99999;overflow:auto;word-break:break-all;white-space:pre-wrap;';
+          document.body.appendChild(overlay);
+        }
+        overlay.innerHTML = '<div><b style="color:#FF6B6B;font-size:14px">❌ 오류 발생</b><br><br>' + msg + (detail ? '<br><br><span style="opacity:0.6">' + detail + '</span>' : '') + '</div>';
+      }
+      window.onerror = function(msg, src, line, col, err) {
+        showError(msg, src + ':' + line + (err && err.stack ? '\n\n' + err.stack : ''));
+      };
+      window.addEventListener('unhandledrejection', function(e) {
+        showError('Unhandled Promise rejection: ' + (e.reason && e.reason.message || e.reason), e.reason && e.reason.stack);
+      });
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

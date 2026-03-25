@@ -62,6 +62,25 @@ RBAC: admin=전체, user/self=본인만, guest=없음
 
 ---
 
+### subscriptions
+
+프리미엄 구독 이력. 유저당 여러 건 가능.
+
+| 필드 | 타입 | 제약 | 설명 |
+|------|------|------|------|
+| id | String | auto | |
+| plan | String | required | monthly/annual |
+| status | String | required | active/expired/cancelled |
+| startedAt | String | required | ISO 날짜 |
+| expiresAt | String | required | ISO 날짜 |
+| amount | Number | required | 4900 or 39900 |
+| createdBy | String | auto | RLS |
+| createdAt | Date | auto | |
+
+RBAC: admin=전체, user/self=본인만, guest=없음
+
+---
+
 ## 관계 다이어그램
 
 ```
@@ -69,7 +88,8 @@ BkendUser (auth)
     │
     ├── meditation_records (1:N)
     ├── diary_entries (1:N)
-    └── user_profiles (1:1)
+    ├── user_profiles (1:1)
+    └── subscriptions (1:N)
 ```
 
 ## 인덱스 권장
@@ -77,3 +97,4 @@ BkendUser (auth)
 - meditation_records: `(createdBy, date)` 복합 인덱스
 - diary_entries: `(createdBy, date)` 복합 인덱스
 - user_profiles: `createdBy` 단일 인덱스 (unique)
+- subscriptions: `(createdBy, status)` 복합 인덱스

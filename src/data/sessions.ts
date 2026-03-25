@@ -35,6 +35,18 @@ export const CATEGORIES: { type: SessionCategory; label: string; emoji: string }
 
 export const SESSIONS: MeditationSession[] = [
   {
+    id: '10',
+    title: '투자 불안 다스리기',
+    subtitle: '불안 완화',
+    category: 'anxiety',
+    duration: 5,
+    isPremium: false,
+    thumbnail: '📊',
+    description: '주가 변동으로 인한 불안감을 호흡과 함께 내려놓는 명상이에요.',
+    instructor: '이수진',
+    tags: ['투자', '불안', '내려놓기'],
+  },
+  {
     id: '1',
     title: '하루의 시작, 고요한 아침',
     subtitle: '아침 명상',
@@ -142,19 +154,6 @@ export const SESSIONS: MeditationSession[] = [
     instructor: '김명상',
     tags: ['저녁', '이완', '마무리'],
   },
-  {
-    id: '10',
-    title: '투자 불안 다스리기',
-    subtitle: '불안 완화',
-    category: 'anxiety',
-    duration: 5,
-    isPremium: false,
-    thumbnail: '📊',
-    description: '주가 변동으로 인한 불안감을 호흡과 함께 내려놓는 명상이에요.',
-    instructor: '이수진',
-    tags: ['투자', '불안', '내려놓기'],
-  },
-
   // ── 스트레스 ──────────────────────────────────────────────────────────────
   {
     id: '11',
@@ -388,7 +387,7 @@ export const SESSIONS: MeditationSession[] = [
     subtitle: '아침 명상',
     category: 'morning',
     duration: 5,
-    isPremium: false,
+    isPremium: true,
     thumbnail: '🙏',
     description: '오늘 감사한 것 세 가지를 찾으며 긍정적인 하루를 열어요.',
     instructor: '박지현',

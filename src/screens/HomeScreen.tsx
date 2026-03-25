@@ -1,8 +1,10 @@
+import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { EmotionPicker } from '../components/EmotionPicker';
 import { MeditationCard } from '../components/MeditationCard';
 import { useStore } from '../store/useStore';
 import { getRecommendedSessions, SESSIONS } from '../data/sessions';
+import { TossAds } from '@apps-in-toss/web-bridge';
 import './HomeScreen.css';
 
 export function HomeScreen() {
@@ -21,6 +23,30 @@ export function HomeScreen() {
     '편안한 저녁이에요 🌙';
 
   const lastSession = records[0];
+  const bannerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // 프로덕션 빌드(ait build)에서만 실행 — dev/sandbox에서 외부 SDK 스크립트 로드 시 WebView 오동작
+    if (!bannerRef.current || !import.meta.env.PROD) return;
+    try {
+      if (!TossAds.initialize.isSupported() || !TossAds.attachBanner.isSupported()) return;
+    } catch { return; }
+
+    let destroyFn: (() => void) | null = null;
+    TossAds.initialize({
+      callbacks: {
+        onInitialized: () => {
+          if (!bannerRef.current) return;
+          try {
+            const result = TossAds.attachBanner('ait.v2.live.c370b14b4edd4113', bannerRef.current, { theme: 'auto' });
+            destroyFn = result.destroy;
+          } catch (err) { console.warn('TossAds attachBanner 실패', err); }
+        },
+        onInitializationFailed: (err) => console.warn('TossAds 초기화 실패', err),
+      },
+    });
+    return () => destroyFn?.();
+  }, []);
 
   return (
     <div className="screen-content home-screen">
@@ -38,7 +64,7 @@ export function HomeScreen() {
           </div>
           <div className="home-point-badge">
             <span className="point-icon">⭐</span>
-            <span className="point-value">{maumPoints.toLocaleString()}P</span>
+            <span className="point-value">{maumPoints.toLocaleString()}코인</span>
           </div>
         </div>
       </motion.div>
@@ -142,6 +168,9 @@ export function HomeScreen() {
         </div>
       </motion.section>
 
+      {/* 배너 광고 */}
+      <div ref={bannerRef} className="ad-banner-container" />
+
       {/* 7일 챌린지 배너 */}
       <motion.div
         className="challenge-banner"
@@ -151,7 +180,7 @@ export function HomeScreen() {
       >
         <div className="challenge-content">
           <p className="challenge-label">🏆 7일 챌린지</p>
-          <p className="challenge-title">7일 연속 명상하면<br />마음P 1,000P를 드려요</p>
+          <p className="challenge-title">7일 연속 명상하면<br />마음코인 100코인을 드려요</p>
           <div className="challenge-progress">
             {Array.from({ length: 7 }).map((_, i) => (
               <div key={i} className={`challenge-dot ${i < streakDays ? 'done' : ''}`}>
@@ -162,7 +191,7 @@ export function HomeScreen() {
         </div>
         <div className="challenge-reward">
           <span className="challenge-reward-icon">⭐</span>
-          <span className="challenge-reward-text">1,000P</span>
+          <span className="challenge-reward-text">100</span>
         </div>
       </motion.div>
     </div>

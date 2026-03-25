@@ -311,6 +311,14 @@
   color: var(--color-text-secondary);
 }
 
+.sub-manage-note {
+  text-align: center;
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  margin: -8px 20px 16px;
+  line-height: 1.5;
+}
+
 /* Settings */
 .settings-card {
   margin: 0 20px 16px;
@@ -491,7 +499,7 @@
   font-size: 12px;
   color: var(--color-text-tertiary);
   text-align: center;
-  margin: -16px 0 16px;
+  margin: 8px 0 16px;
   line-height: 1.5;
 }
 
@@ -568,4 +576,169 @@
   color: var(--color-text-secondary);
   cursor: pointer;
   font-family: inherit;
+}
+
+/* Notification time chip */
+.notif-time-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 4px;
+  padding: 4px 10px 4px 8px;
+  background: rgba(92, 107, 192, 0.1);
+  border: 1.5px solid rgba(92, 107, 192, 0.25);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+
+.notif-time-chip:active {
+  background: rgba(92, 107, 192, 0.18);
+}
+
+.notif-time-chip-icon {
+  font-size: 12px;
+}
+
+.notif-time-chip-text {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.notif-time-chip-arrow {
+  font-size: 14px;
+  color: var(--color-primary);
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Time picker bottom sheet */
+.time-picker-sheet {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--color-surface);
+  border-radius: 24px 24px 0 0;
+  padding: 12px 24px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.time-picker-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin-bottom: 6px;
+}
+
+.time-picker-sub {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+/* AM/PM 토글 */
+.ampm-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 28px;
+  background: var(--color-surface-2);
+  border-radius: var(--radius-full);
+  padding: 4px;
+}
+
+.ampm-btn {
+  padding: 8px 24px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.ampm-btn.active {
+  background: var(--color-primary);
+  color: white;
+  box-shadow: 0 2px 8px rgba(92, 107, 192, 0.35);
+}
+
+/* 시/분 휠 */
+.time-wheel-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 32px;
+}
+
+.time-wheel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.wheel-arrow {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: var(--color-surface-2);
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wheel-arrow:active {
+  background: var(--color-border);
+}
+
+.wheel-value {
+  font-size: 48px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -2px;
+  min-width: 72px;
+  text-align: center;
+}
+
+.wheel-colon {
+  font-size: 40px;
+  font-weight: 800;
+  color: var(--color-text-tertiary);
+  margin-bottom: 4px;
+  line-height: 1;
+}
+
+.time-picker-confirm {
+  width: 100%;
+  padding: 16px;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 4px 16px rgba(92, 107, 192, 0.35);
+  transition: opacity 0.15s;
+}
+
+.time-picker-confirm:active {
+  opacity: 0.88;
 }

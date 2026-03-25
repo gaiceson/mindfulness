@@ -15,7 +15,7 @@ export const CATEGORY_SOUND_PROFILES: Record<SessionCategory, SoundProfile> = {
   sleep:   { label: '파도소리',      emoji: '🌊',  description: '느리게 밀려오는 파도로 잠에 들어요' },
   focus:   { label: '바이노럴 비트', emoji: '🎯',  description: '10Hz 알파파로 맑은 집중 상태예요' },
   anxiety: { label: '시냇물소리',    emoji: '💧',  description: '졸졸 흐르는 물소리로 불안을 흘려요' },
-  breath:  { label: '바람소리',      emoji: '🌬',  description: '호흡 리듬에 맞춘 부드러운 바람이에요' },
+  breath:  { label: '가이드 명상',   emoji: '🌬',  description: '호흡 리듬에 맞춤 가이드 소리예요' },
   morning: { label: '새소리',        emoji: '🌅',  description: '맑은 새소리로 상쾌한 아침을 열어요' },
   love:    { label: '싱잉볼',        emoji: '💜',  description: '528Hz 싱잉볼이 마음을 감싸요' },
 };
@@ -25,7 +25,7 @@ export const CATEGORY_SOUND_PROFILES: Record<SessionCategory, SoundProfile> = {
 const SESSION_SOUND_MAP: Record<string, string> = {
   // 아침 명상
   '1':  'morning.mp3',   // 하루의 시작, 고요한 아침
-  '29': 'morning.mp3',   // 감사 일기로 하루 시작
+  '29': 'thanks.mp3',    // 감사 일기로 하루 시작
   '30': 'morning2.mp3',  // 오늘 하루 의도 설정하기
 
   // 스트레스
@@ -73,6 +73,11 @@ const SESSION_SOUND_MAP: Record<string, string> = {
   '9':  'stress2.mp3',   // 퇴근 후 하루 마무리
 };
 
+// 세션 ID별 사운드 프로필 오버라이드 (카테고리 기본값 대신 사용)
+export const SESSION_SOUND_PROFILE_OVERRIDES: Record<string, SoundProfile> = {
+  '29': { label: '가이드 명상', emoji: '🌅', description: '감사일기로 하루 시작해요.' },
+};
+
 // 카테고리 기본 파일 (세션 ID 매핑 없을 경우 fallback)
 const CATEGORY_DEFAULT_SOUND: Record<SessionCategory, string> = {
   stress:  'stress.mp3',
@@ -86,10 +91,17 @@ const CATEGORY_DEFAULT_SOUND: Record<SessionCategory, string> = {
 
 // ── 내부 상태 ─────────────────────────────────────────────────────────────
 let currentAudio: HTMLAudioElement | null = null;
+let fadingAudio: HTMLAudioElement | null = null;  // 페이드아웃 중인 오디오
 let fadeInterval: ReturnType<typeof setInterval> | null = null;
 
 function clearFade() {
   if (fadeInterval) { clearInterval(fadeInterval); fadeInterval = null; }
+  // 페이드아웃 도중 중단 시 즉시 정지
+  if (fadingAudio) {
+    fadingAudio.pause();
+    fadingAudio.src = '';
+    fadingAudio = null;
+  }
 }
 
 // ── 공개 API ─────────────────────────────────────────────────────────────
@@ -128,17 +140,20 @@ export function stopSessionSound(fadeOut = true) {
 
   if (fadeOut) {
     const audio = currentAudio;
+    fadingAudio = audio;
+    currentAudio = null;
     const step = audio.volume / 40; // 2000ms / 50ms = 40 steps
     fadeInterval = setInterval(() => {
       const next = Math.max(audio.volume - step, 0);
       audio.volume = next;
       if (next <= 0) {
-        clearFade();
+        clearInterval(fadeInterval!);
+        fadeInterval = null;
         audio.pause();
         audio.src = '';
+        fadingAudio = null;
       }
     }, 50);
-    currentAudio = null;
   } else {
     currentAudio.pause();
     currentAudio.src = '';

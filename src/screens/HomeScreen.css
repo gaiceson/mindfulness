@@ -146,6 +146,13 @@
   white-space: nowrap;
 }
 
+/* Ad banner */
+.ad-banner-container {
+  margin: 4px 20px 12px;
+  min-height: 96px;
+}
+
+
 /* Challenge banner */
 .challenge-banner {
   margin: 8px 20px 20px;

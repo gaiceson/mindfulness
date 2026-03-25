@@ -421,8 +421,18 @@ app.get('/auth/toss/login-me', async (req: Request, res: Response) => {
 
 // 헬스체크
 app.get('/health', (_req: Request, res: Response) => {
-  const hasCert = !!(process.env.TOSS_CERT_CONTENT?.replace(/\s/g, '') && process.env.TOSS_KEY_CONTENT?.replace(/\s/g, ''));
-  res.json({ status: 'ok', env: BKEND_ENV, notifCount: notifSchedules.size, mtls: hasCert ? 'loaded' : 'missing' });
+  const certRaw = process.env.TOSS_CERT_CONTENT ?? '';
+  const keyRaw  = process.env.TOSS_KEY_CONTENT ?? '';
+  const certClean = certRaw.replace(/\s/g, '');
+  const keyClean  = keyRaw.replace(/\s/g, '');
+  const hasCert = !!(certClean && keyClean);
+  res.json({
+    status: 'ok',
+    env: BKEND_ENV,
+    notifCount: notifSchedules.size,
+    mtls: hasCert ? 'loaded' : 'missing',
+    debug: { certLen: certClean.length, keyLen: keyClean.length },
+  });
 });
 
 // ── 알림 스케줄 API ────────────────────────────────────────────────────────

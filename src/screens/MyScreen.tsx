@@ -202,13 +202,6 @@ export function MyScreen() {
           <p className="sub-manage-note">
             구독 해지는 토스 앱 &gt; 전체 &gt; 구독 관리에서 할 수 있어요
           </p>
-          {/* TODO: 테스트용 - 배포 전 삭제 */}
-          <button
-            style={{ marginTop: 8, padding: '6px 12px', fontSize: 12, color: '#FF3B30', background: 'none', border: '1px solid #FF3B30', borderRadius: 8, cursor: 'pointer' }}
-            onClick={() => useStore.setState({ isPremium: false, premiumPlan: null, premiumExpiresAt: null })}
-          >
-            [테스트] 구독 초기화
-          </button>
         </>
       ) : (
         <div className="subscription-card">

@@ -10,7 +10,7 @@ export default defineConfig({
   brand: {
     displayName: '마음챙김',
     primaryColor: '#5C6BC0',
-    icon: 'http://localhost:3000/logo.png',
+    icon: 'https://mindfulness-production-2fee.up.railway.app/logo.png',
   },
   web: {
     host: webHost,

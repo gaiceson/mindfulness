@@ -435,6 +435,15 @@ app.get('/auth/toss/login-me', async (req: Request, res: Response) => {
   }
 });
 
+// 앱 로고 (granite.config.ts brand.icon 용 — Toss 네이티브 네비게이션 바 표시)
+const LOGO_B64 = 'iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAKtSURBVEhLlZVbb9tGEIW/2eVFFwu2AyRGURSFiwJBgb7koS/9/2iAvLV/oAGs1GlSy5IomqTJ3ekDSYlaMUp7gCWXuzPnzMwOsfLbuzslxHBFRqdHJl+EggnXoGPqR/cygBGQwdp/gfliKNoOAYwIkYHEQmqUyOhQ/yxOMzgRbAmnsWeROi4mnmmkWKP7bM6hFehJT8j76BWswHyOzGZIBLH5vxn05EMvaR8i8MCaP7Ilv2dLHlgjMhLNEN32+RJ1c+eFG53z2pa8jipudI5X0FCjO7cDh3YCwxML8vaq1F5YmA0/TB0/zhwXNqN2QX+EYgBIkEFYHmn9ErclyZcU65ynVUayfU+iu2PO0LeD2X+c5DtAlbG5v+fxw5LV3R3r5QekzEKrURwyONNzVXRNnT9DvoMix1c1ZXwdmnWRHwd6esgj+BzHvH/1Kyu+IY9e4W9/4fqiCM06HAf6VQEBSufYXF3x1/dvWPz0M1cvJ4jWoWmLoFm+KqBAYwVFuF3kTOIK9Y40qjGio209xFkBAcqpYKMI5xwvTIm6BvWOOLLcXFanDgEGAqfyZaz4tBV4VkvRCKjHWkMUJyymNZez59DtiGogcJDvfgE+7go+PhZUZcXUKk92hkQpToWqKii2j9j64UAxJOhE9gLD7PZ/e1Fz//eaz4871qsN8/yeMttQZluKzZrtwz/snkYrs1+U8EYLjf/8tOJTltN45bu05PaygabEY9DJS5h/O1LcDhoIhFn0nkeN0l1CjNxuY0Ly9t2d6oiReqVxnqpyVM+OunG4RlGUOLIkiSVN23dkDTIs/GC2zyAsjXbReq94r6hXvLZRiwjGdKP7Pngdz0y4pcFmZIUkNqSpZTqJmKQRaWqJY4O10pEfEw9LZRi0ZV+qfpyic9d+9GuHd+j3L4NCMAuSzf19AAAAAElFTkSuQmCC';
+const LOGO_BUF = Buffer.from(LOGO_B64, 'base64');
+app.get('/logo.png', (_req: Request, res: Response) => {
+  res.setHeader('Content-Type', 'image/png');
+  res.setHeader('Cache-Control', 'public, max-age=86400');
+  res.send(LOGO_BUF);
+});
+
 // 헬스체크
 app.get('/health', (_req: Request, res: Response) => {
   const certRaw = process.env.TOSS_CERT_CONTENT ?? '';
